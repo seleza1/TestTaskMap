@@ -62,9 +62,8 @@ class ViewController: UIViewController {
     @objc func addAdressButtonTapped() {
         alertAddAdress(title: "Добавить", placeholer: "Введите адрес") { text in
             print(text)
+
         }
-        
-        
     }
     
     @objc func roadButtonTapped() {
@@ -74,6 +73,19 @@ class ViewController: UIViewController {
     
     @objc func resetButtonTapped() {
         print("tappedReset")
+        
+    }
+    
+    private func setupaPlacemark() {
+        
+        let geocoder = CLGeocoder()
+        geocoder.geocodeAddressString("Санкт-Петербург, Некрасова 20") { [weak self] placemark, error in
+            if let error = error {
+                print(error.localizedDescription)
+                self?.alertError(title: "Error", message: "Server not found")
+            }
+        }
+        
         
     }
 }
