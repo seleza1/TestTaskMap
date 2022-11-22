@@ -11,6 +11,8 @@ import CoreLocation
 
 class ViewController: UIViewController {
     
+    var annotationsArray = [MKPointAnnotation]()
+    
     let mapView: MKMapView = {
         let mapView = MKMapView()
         mapView.translatesAutoresizingMaskIntoConstraints = false
@@ -60,8 +62,8 @@ class ViewController: UIViewController {
     }
     
     @objc func addAdressButtonTapped() {
-        alertAddAdress(title: "Добавить", placeholer: "Введите адрес") { text in
-            print(text)
+        alertAddAdress(title: "Добавить", placeholer: "Введите адрес") { [weak self]text in
+            self?.setupaPlacemark(adressPlace: text)
 
         }
     }
@@ -76,14 +78,34 @@ class ViewController: UIViewController {
         
     }
     
-    private func setupaPlacemark() {
+    private func setupaPlacemark(adressPlace: String) {
         
         let geocoder = CLGeocoder()
-        geocoder.geocodeAddressString("Санкт-Петербург, Некрасова 20") { [weak self] placemark, error in
+        geocoder.geocodeAddressString(adressPlace) { [self] placemarks, error in
             if let error = error {
                 print(error.localizedDescription)
-                self?.alertError(title: "Error", message: "Server not found")
+                 alertError(title: "Error", message: "Server not found")
+                return
             }
+            
+            guard let placemarks = placemarks else { return }
+            let placemark = placemarks.first
+            
+            let annotation = MKPointAnnotation()
+            annotation.title = "\(adressPlace)"
+            
+            guard let placeMarkLocation = placemark?.location else { return }
+            annotation.coordinate = placeMarkLocation.coordinate
+            
+            annotationsArray.append(annotation)
+            
+            if annotationsArray.count > 2 {
+                roadButton.isHidden = false
+                resetButton.isHidden = false
+            }
+            
+            mapView.showAnnotations(annotationsArray, animated: true)
+            
         }
         
         
