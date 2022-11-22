@@ -22,7 +22,7 @@ class ViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Add adress", for: .normal)
         button.titleLabel?.numberOfLines = 0
-        button.backgroundColor = .red
+        button.backgroundColor = #colorLiteral(red: 0.8078431487, green: 0.02745098062, blue: 0.3333333433, alpha: 1)
         button.contentHorizontalAlignment = .center
         button.layer.cornerRadius = 35
         return button
@@ -31,9 +31,10 @@ class ViewController: UIViewController {
     let roadButton: UIButton = {
         let button = UIButton()
         button.setTitle("Road", for: .normal)
-        button.backgroundColor = .green
+        button.backgroundColor = #colorLiteral(red: 0, green: 1, blue: 0.2726448476, alpha: 1)
         button.layer.cornerRadius = 15
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.isHidden = true
         return button
     }()
     
@@ -43,7 +44,7 @@ class ViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 15
         button.backgroundColor = .red
-        
+        button.isHidden = true
         return button
     }()
     
@@ -59,7 +60,9 @@ class ViewController: UIViewController {
     }
     
     @objc func addAdressButtonTapped() {
-        print("addTapped")
+        alertAddAdress(title: "Добавить", placeholer: "Введите адрес") { text in
+            print(text)
+        }
         
         
     }
