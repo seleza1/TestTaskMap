@@ -16,6 +16,8 @@ class ViewController: UIViewController {
     let mapView: MKMapView = {
         let mapView = MKMapView()
         mapView.translatesAutoresizingMaskIntoConstraints = false
+        mapView.showsCompass = false
+
         return mapView
     }()
     
@@ -53,6 +55,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        mapView.delegate = self
+        
         setConstraints()
         
         addAdressButton.addTarget(self,action: #selector(addAdressButtonTapped), for: .touchUpInside)
@@ -68,12 +72,22 @@ class ViewController: UIViewController {
     }
     
     @objc func roadButtonTapped() {
-        print("tappedRoad")
         
+        for index in 0...annotationsArray.count - 2 {
+            
+            createDirectionRequest(startCoordinate: annotationsArray[index].coordinate, destinationCoordinate: annotationsArray[index + 1].coordinate)
+        }
+        
+        mapView.showAnnotations(annotationsArray, animated: true)
     }
     
     @objc func resetButtonTapped() {
-        print("tappedReset")
+        mapView.removeOverlays(mapView.overlays)
+        mapView.removeAnnotations(mapView.annotations)
+        annotationsArray = [MKPointAnnotation]()
+        
+        roadButton.isHidden = true
+        resetButton.isHidden = true
         
     }
     
@@ -82,7 +96,7 @@ class ViewController: UIViewController {
         let geocoder = CLGeocoder()
         geocoder.geocodeAddressString(adressPlace) { [self] placemarks, error in
             if let error = error {
-                print(error.localizedDescription)
+                print(error)
                  alertError(title: "Error", message: "Server not found")
                 return
             }
@@ -98,7 +112,7 @@ class ViewController: UIViewController {
             
             annotationsArray.append(annotation)
             
-            if annotationsArray.count > 2 {
+            if annotationsArray.count > 1 {
                 roadButton.isHidden = false
                 resetButton.isHidden = false
             }
@@ -116,14 +130,37 @@ class ViewController: UIViewController {
         request.source = MKMapItem(placemark: startLocation)
         request.destination = MKMapItem(placemark: destinationLocation)
         request.transportType = .walking
-        request.highwayPreference = .any
         
         let direction = MKDirections(request: request)
-        direction.calculate { response, error in
-            <#code#>
+        direction.calculate { responce, error in
+            if let error = error {
+                print(error.localizedDescription)
+                return
+            }
+            guard let responce = responce else {
+                self.alertError(title: "Ошибка", message: "Маршрут недоступен")
+                return
+                
+            }
+            var minRoute = responce.routes[0]
+            for route in responce.routes {
+                minRoute = (route.distance < minRoute.distance) ? route : minRoute
+            }
+            
+            self.mapView.addOverlay(minRoute.polyline)
+            
         }
-        
     }
+}
+
+extension ViewController: MKMapViewDelegate {
+    
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        let renderer = MKPolylineRenderer(overlay: overlay as! MKPolyline)
+        renderer.strokeColor = .red
+        return renderer
+    }
+    
 }
 
 extension ViewController {
