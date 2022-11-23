@@ -62,9 +62,8 @@ class ViewController: UIViewController {
     }
     
     @objc func addAdressButtonTapped() {
-        alertAddAdress(title: "Добавить", placeholer: "Введите адрес") { [weak self]text in
+        alertAddAdress(title: "Добавить", placeholer: "Введите адрес") { [weak self] text in
             self?.setupaPlacemark(adressPlace: text)
-
         }
     }
     
@@ -105,9 +104,24 @@ class ViewController: UIViewController {
             }
             
             mapView.showAnnotations(annotationsArray, animated: true)
-            
         }
+    }
+    
+    private func createDirectionRequest(startCoordinate: CLLocationCoordinate2D, destinationCoordinate: CLLocationCoordinate2D ) {
         
+        let startLocation = MKPlacemark(coordinate: startCoordinate)
+        let destinationLocation = MKPlacemark(coordinate: destinationCoordinate)
+        
+        let request = MKDirections.Request()
+        request.source = MKMapItem(placemark: startLocation)
+        request.destination = MKMapItem(placemark: destinationLocation)
+        request.transportType = .walking
+        request.highwayPreference = .any
+        
+        let direction = MKDirections(request: request)
+        direction.calculate { response, error in
+            <#code#>
+        }
         
     }
 }
@@ -126,7 +140,7 @@ extension ViewController {
         
         mapView.addSubview(addAdressButton)
         NSLayoutConstraint.activate([
-            addAdressButton.topAnchor.constraint(equalTo: mapView.topAnchor, constant: 50),
+            addAdressButton.topAnchor.constraint(equalTo: mapView.topAnchor, constant: 40),
             addAdressButton.trailingAnchor.constraint(equalTo: mapView.trailingAnchor, constant: -20),
             addAdressButton.heightAnchor.constraint(equalToConstant: 70),
             addAdressButton.widthAnchor.constraint(equalToConstant: 70)
