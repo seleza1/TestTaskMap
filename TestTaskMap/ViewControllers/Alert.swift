@@ -8,7 +8,7 @@
 import UIKit
 
 extension UIViewController {
-    func alertAddAdress(title: String, placeholer: String, completionHandler: @escaping (String)-> Void) {
+    func alertAddAdress(title: String, placeholder: String, completionHandler: @escaping (String)-> Void) {
         
         let alertController = UIAlertController(title: title, message: nil, preferredStyle: .alert)
         let alertOk = UIAlertAction(title: "Ok", style: .default) { (action) in
@@ -19,7 +19,7 @@ extension UIViewController {
         }
         
         alertController.addTextField {(tf) in
-            tf.placeholder = placeholer
+            tf.placeholder = placeholder
         }
         
         let alertCancel = UIAlertAction(title: "Cancel", style: .default) { _ in

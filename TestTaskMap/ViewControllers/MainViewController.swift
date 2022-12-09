@@ -9,13 +9,12 @@ import UIKit
 import MapKit
 import CoreLocation
 
-class ViewController: UIViewController {
+class MainViewController: UIViewController {
     
     var annotationsArray = [MKPointAnnotation]()
     
     let mapView: MKMapView = {
         let mapView = MKMapView()
-        mapView.translatesAutoresizingMaskIntoConstraints = false
         mapView.showsCompass = false
 
         return mapView
@@ -56,17 +55,14 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         mapView.delegate = self
-        
+        addSubview()
         setConstraints()
-        
-        addAdressButton.addTarget(self,action: #selector(addAdressButtonTapped), for: .touchUpInside)
-        roadButton.addTarget(self, action: #selector(roadButtonTapped), for: .touchUpInside)
-        resetButton.addTarget(self, action: #selector(resetButtonTapped), for: .touchUpInside)
-        
+        addTargetButton()
     }
     
     @objc func addAdressButtonTapped() {
-        alertAddAdress(title: "Добавить", placeholer: "Введите адрес") { [weak self] text in
+        
+        alertAddAdress(title: "Добавить", placeholder: "Введите адрес") { [weak self] text in
             self?.setupaPlacemark(adressPlace: text)
         }
     }
@@ -82,6 +78,7 @@ class ViewController: UIViewController {
     }
     
     @objc func resetButtonTapped() {
+        
         mapView.removeOverlays(mapView.overlays)
         mapView.removeAnnotations(mapView.annotations)
         annotationsArray = [MKPointAnnotation]()
@@ -89,6 +86,21 @@ class ViewController: UIViewController {
         roadButton.isHidden = true
         resetButton.isHidden = true
         
+    }
+    
+    private func addSubview() {
+        
+        view.addSubview(mapView)
+        mapView.addSubview(addAdressButton)
+        mapView.addSubview(roadButton)
+        mapView.addSubview(resetButton)
+    }
+    
+    private func addTargetButton() {
+        
+        addAdressButton.addTarget(self,action: #selector(addAdressButtonTapped), for: .touchUpInside)
+        roadButton.addTarget(self, action: #selector(roadButtonTapped), for: .touchUpInside)
+        resetButton.addTarget(self, action: #selector(resetButtonTapped), for: .touchUpInside)
     }
     
     private func setupaPlacemark(adressPlace: String) {
@@ -129,7 +141,7 @@ class ViewController: UIViewController {
         let request = MKDirections.Request()
         request.source = MKMapItem(placemark: startLocation)
         request.destination = MKMapItem(placemark: destinationLocation)
-        request.transportType = .walking
+        request.transportType = .automobile
         
         let direction = MKDirections(request: request)
         direction.calculate { responce, error in
@@ -153,7 +165,7 @@ class ViewController: UIViewController {
     }
 }
 
-extension ViewController: MKMapViewDelegate {
+extension MainViewController: MKMapViewDelegate {
     
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         let renderer = MKPolylineRenderer(overlay: overlay as! MKPolyline)
@@ -163,11 +175,12 @@ extension ViewController: MKMapViewDelegate {
     
 }
 
-extension ViewController {
+extension MainViewController {
     
     func setConstraints() {
         
-        view.addSubview(mapView)
+        mapView.translatesAutoresizingMaskIntoConstraints = false
+
         NSLayoutConstraint.activate([
             mapView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),
             mapView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
@@ -175,27 +188,26 @@ extension ViewController {
             mapView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
         ])
         
-        mapView.addSubview(addAdressButton)
+        addAdressButton.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             addAdressButton.topAnchor.constraint(equalTo: mapView.topAnchor, constant: 40),
             addAdressButton.trailingAnchor.constraint(equalTo: mapView.trailingAnchor, constant: -20),
             addAdressButton.heightAnchor.constraint(equalToConstant: 70),
             addAdressButton.widthAnchor.constraint(equalToConstant: 70)
-        
-        
         ])
         
-        mapView.addSubview(roadButton)
+        roadButton.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             roadButton.leadingAnchor.constraint(equalTo: mapView.leadingAnchor, constant: 20),
             roadButton.bottomAnchor.constraint(equalTo: mapView.bottomAnchor, constant: -30),
             roadButton.heightAnchor.constraint(equalToConstant: 50),
             roadButton.widthAnchor.constraint(equalToConstant: 100)
-        
-        
         ])
         
-        mapView.addSubview(resetButton)
+        resetButton.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             resetButton.trailingAnchor.constraint(equalTo: mapView.trailingAnchor, constant: -20),
             resetButton.bottomAnchor.constraint(equalTo: mapView.bottomAnchor, constant: -30),
@@ -204,8 +216,5 @@ extension ViewController {
         
         
         ])
-
-        
-        
     }
 }
